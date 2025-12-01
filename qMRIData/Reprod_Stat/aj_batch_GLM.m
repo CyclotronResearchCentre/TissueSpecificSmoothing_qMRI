@@ -156,8 +156,6 @@ clear;clc;
 addpath("C:\Users\aj\Documents\toolbox\spm12");
 spm_get_defaults('stats.fmri.ufp',0.5);
 
-addpath("C:\Users\aj\Documents\toolbox\spm12");
-
 % Choose 'TSPOON', 'TWS' or 'TWsmoot'
 smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
 meth = 4;
@@ -192,11 +190,8 @@ if isempty(gcp('nocreate'))
 end
 
 for i = 1:1 %1:nMetricsNames
-    smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
-    metrics_names = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
-    TC_names = {'GM', 'WM'};
     inputs  = cell(3,1);
-    jobfile = cellstr(fullfile(pwd,'aj_batch_GLM_job.m'));
+    jobfile = {fullfile('C:\Users\aj\Documents\SMOOTHING\TissueSpecificSmoothing\qMRIData\Reprod_Stat', 'aj_batch_GLM_job.m')};
     
     for ii = 1:1 %1:nTCNames
         % Output file
@@ -244,10 +239,18 @@ for i = 1:1 %1:nMetricsNames
 
         % Select explicit masks defining GM and WM voxels
         inputs{3} = cellstr(spm_select('ExtFPList',fullfile(ds_dir,'derivatives'),sprintf('^atlas-.*%s_space-MNI_mask.*\\.nii$',TC_names{ii})));
-        
-        spm_jobman('run', jobfile, inputs{:});
+        if isempty(inputs{3})
+            warning('No mask file found for %s', TC_names{ii});
+            continue;
+        end
+
+        % spm_jobman('run', jobfile, inputs{:});
         % WARNING: have to remove % in job file to do spm_get_defaults('stats.fmri.ufp',0.5);
     end
 end
 
-delete(gcp('nocreate'));
+try
+    delete(gcp('nocreate'));
+catch
+    warning('Parallel pool already closed or does not exist.');
+end
