@@ -11,7 +11,7 @@ load('C:\Users\aj\Documents\SMOOTHING\data\qMRI_AgingCallaghan\reg_age.mat');
 matlabbatch{1}.spm.stats.factorial_design.des.mreg.mcov(1).c = age;
 matlabbatch{1}.spm.stats.factorial_design.des.mreg.mcov(1).cname = 'Age';
 matlabbatch{1}.spm.stats.factorial_design.des.mreg.mcov(1).iCC = 1;
-load('C:\Users\aj\Documents\SMOOTHING\data\qMRI_AgingCallaghana\reg_sex.mat');
+load('C:\Users\aj\Documents\SMOOTHING\data\qMRI_AgingCallaghan\reg_sex.mat');
 matlabbatch{1}.spm.stats.factorial_design.des.mreg.mcov(2).c = sex;
 matlabbatch{1}.spm.stats.factorial_design.des.mreg.mcov(2).cname = 'Sex';
 matlabbatch{1}.spm.stats.factorial_design.des.mreg.mcov(2).iCC = 1;

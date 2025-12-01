@@ -244,7 +244,7 @@ for i = 1:1 %1:nMetricsNames
             continue;
         end
 
-        % spm_jobman('run', jobfile, inputs{:});
+        spm_jobman('run', jobfile, inputs{:});
         % WARNING: have to remove % in job file to do spm_get_defaults('stats.fmri.ufp',0.5);
     end
 end
