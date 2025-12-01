@@ -46,10 +46,10 @@ addpath('C:\Users\antoi\Documents\master_thesis\MATLAB\spm12');
 
 param.smoothName = 'AJ-TSPOON';
 ds_dir = 'D:\Master_Thesis\Data\BIDS_AgingData';
-bids_dir = fullfile(ds_dir, 'derivatives', param.smoothName);
+smoo_dir = fullfile(ds_dir, 'derivatives', param.smoothName);
 
 % Get list of GM files
-GM_files = spm_select('FPListRec', bids_dir, sprintf('^tspoon1_sub*'));
+GM_files = spm_select('FPListRec', smoo_dir, sprintf('^tspoon1_sub*'));
 nfiles = size(GM_files, 1);
 
 % Rename each file
@@ -64,7 +64,7 @@ for i = 1:nfiles
 end
 
 % Get list of WM files
-WM_files = spm_select('FPListRec', bids_dir, sprintf('^tspoon2_sub*'));
+WM_files = spm_select('FPListRec', smoo_dir, sprintf('^tspoon2_sub*'));
 nfiles = size(WM_files, 1);
 
 % Rename each file
@@ -79,9 +79,83 @@ for i = 1:nfiles
 end
 
 %% GLM on smoothed data
-% Cleaning environment & setting up SPM path
+% % Cleaning environment & setting up SPM path
+% clear;clc;
+% % addpath('C:\Users\antoi\Documents\master_thesis\MATLAB\spm12');
+% addpath("C:\Users\aj\Documents\toolbox\spm12");
+% 
+% % Choose 'TSPOON', 'TWS' or 'TWsmoot'
+% smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
+% meth = 4;
+% 
+% % Paths to access to script, smoothed data and data
+% ds_dir = 'C:\Users\aj\Documents\SMOOTHING\data\qMRI_AgingCallaghan';
+% if meth==1
+%     param.smoothName = smoothing_method{meth};
+% else
+%     param.smoothName = sprintf('AJ-%s', smoothing_method{meth});
+% end
+% bids_dir = fullfile(ds_dir,'derivatives',param.smoothName);
+% 
+% if meth==4
+%     tmp_unzip_dir = fullfile(ds_dir,'derivatives','AJ-SUSAN_unzipped');
+%     if ~exist(tmp_unzip_dir,'dir'), mkdir(tmp_unzip_dir); end
+% end
+% 
+% % Set up the metrics and TC names lists
+% metrics_names = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
+% nMetricsNames = length(metrics_names);
+% TC_names = {'GM', 'WM'};
+% nTCNames = length(TC_names);
+% 
+% % Initialize SPM configuration
+% spm_jobman('initcfg'); 
+% spm('defaults', 'fmri');
+% 
+% % Start parallel pool if not already open
+% if isempty(gcp('nocreate'))
+%     parpool; % Create a default parallel pool
+% end
+% 
+% parfor i = 4:4 %1:nMetricsNames
+%     smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
+%     metrics_names = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
+%     TC_names = {'GM', 'WM'};
+%     inputs  = cell(3,1);
+%     jobfile = cellstr(fullfile(pwd,'aj_batch_GLM_job.m'));
+% 
+%     for ii = 2:2 %1:nTCNames
+%         % Output file
+%         inputs{1} = cellstr(fullfile(ds_dir,'derivatives',sprintf('AJ-%s_GLM',smoothing_method{meth}),sprintf('%s_%s',metrics_names{i},TC_names{ii})));
+% 
+%         % Select files for each qMRI metric and each TC for all subjects
+%         if meth==1
+%             inputs{2} = cellstr(spm_select('FPListRec',bids_dir,sprintf('^.*%ssmo_%s.*\\.nii$',TC_names{ii},metrics_names{i})));
+%         else
+%             inputs{2} = cellstr(spm_select('FPListRec',bids_dir,sprintf('^%s_%s.*%s.*\\.nii$',smoothing_method{meth},TC_names{ii},metrics_names{i}))); 
+%         end
+% 
+%         % Select explicit masks defining GM and WM voxels
+%         inputs{3} = cellstr(spm_select('ExtFPList',fullfile(ds_dir,'derivatives'),sprintf('^atlas-.*%s_space-MNI_mask.*\\.nii$',TC_names{ii})));
+% 
+%         spm_jobman('run', jobfile, inputs{:});
+%     end
+% end
+% 
+% delete(gcp('nocreate'));
+
+%% CORRECTED GLM on smoothed data
+% WARNING: have to remove % in job file to do spm_get_defaults('stats.fmri.ufp',0.5);
+
+% New script to run the initial batch for a specific qMRI parameter and
+% tissue class with spm.stats.fmri.ufp = 0.5 instead of 0.001 -> test if
+% the generated mask.nii during model estimation corresponds better.
+
+% Cleaning environment & setting up SPM environment
 clear;clc;
-% addpath('C:\Users\antoi\Documents\master_thesis\MATLAB\spm12');
+addpath('C:\Users\antoi\Documents\master_thesis\MATLAB\spm12');
+spm_get_defaults('stats.fmri.ufp',0.5);
+
 addpath("C:\Users\aj\Documents\toolbox\spm12");
 
 % Choose 'TSPOON', 'TWS' or 'TWsmoot'
@@ -89,13 +163,18 @@ smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
 meth = 4;
 
 % Paths to access to script, smoothed data and data
-ds_dir = 'C:\Users\aj\OneDrive - Universite de Liege\Documents\SMOOTHING\Data\BIDS_AgingData';
+ds_dir = 'C:\Users\aj\Documents\SMOOTHING\data\qMRI_AgingCallaghan';
 if meth==1
     param.smoothName = smoothing_method{meth};
 else
     param.smoothName = sprintf('AJ-%s', smoothing_method{meth});
 end
-bids_dir = fullfile(ds_dir,'derivatives',param.smoothName);
+smoo_dir = fullfile(ds_dir,'derivatives',param.smoothName);
+
+if meth==4
+    tmp_unzip_dir = fullfile(ds_dir,'derivatives','AJ-SUSAN_unzipped');
+    if ~exist(tmp_unzip_dir,'dir'), mkdir(tmp_unzip_dir); end
+end
 
 % Set up the metrics and TC names lists
 metrics_names = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
@@ -112,84 +191,16 @@ if isempty(gcp('nocreate'))
     parpool; % Create a default parallel pool
 end
 
-parfor i = 1:nMetricsNames
+for i = 4:4 %1:nMetricsNames
     smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
     metrics_names = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
     TC_names = {'GM', 'WM'};
     inputs  = cell(3,1);
     jobfile = cellstr(fullfile(pwd,'aj_batch_GLM_job.m'));
     
-    for ii = 1:nTCNames
-        % Output file
-        inputs{1} = cellstr(fullfile(ds_dir,'derivatives',sprintf('AJ-%s_GLM',smoothing_method{meth}),sprintf('%s_%s',metrics_names{i},TC_names{ii})));
-        
-        % Select files for each qMRI metric and each TC for all subjects
-        if meth==1
-            inputs{2} = cellstr(spm_select('FPListRec',bids_dir,sprintf('^.*%ssmo_%s.*\\.nii$',TC_names{ii},metrics_names{i})));
-        else
-            inputs{2} = cellstr(spm_select('FPListRec',bids_dir,sprintf('^%s_%s.*%s.*\\.nii$',smoothing_method{meth},TC_names{ii},metrics_names{i}))); 
-        end
-         
-        % Select explicit masks defining GM and WM voxels
-        inputs{3} = cellstr(spm_select('ExtFPList',fullfile(ds_dir,'derivatives'),sprintf('^atlas-.*%s_space-MNI_mask.*\\.nii$',TC_names{ii})));
-        
-        spm_jobman('run', jobfile, inputs{:});
-    end
-end
-
-delete(gcp('nocreate'));
-
-%% CORRECTED GLM on smoothed data
-% WARNING: have to remove % in job file to do spm_get_defaults('stats.fmri.ufp',0.5);
-
-% New script to run the initial batch for a specific qMRI parameter and
-% tissue class with spm.stats.fmri.ufp = 0.5 instead of 0.001 -> test if
-% the generated mask.nii during model estimation corresponds better.
-
-% Cleaning environment & setting up SPM environment
-clear;clc;
-addpath('C:\Users\antoi\Documents\master_thesis\MATLAB\spm12');
-spm_get_defaults('stats.fmri.ufp',0.5);
-
-% Choose 'TSPOON', 'TWS' or 'TWsmoot'
-smoothing_method = {'TWsmoot', 'TWS', 'TSPOON'};
-meth = 2;
-
-% Paths to access to script, smoothed data and data
-script_dir = 'C:\Users\antoi\Documents\master_thesis\MATLAB\agingdata';
-ds_dir = 'D:\Master_Thesis\Data\BIDS_AgingData';
-if meth==1
-    param.smoothName = smoothing_method{meth};
-else
-    param.smoothName = sprintf('AJ-%s', smoothing_method{meth});
-end
-bids_dir = fullfile(ds_dir,'derivatives',param.smoothName);
-
-% Set up the metrics and TC names lists
-metrics_names = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
-nMetricsNames = length(metrics_names);
-TC_names = {'GM', 'WM'};
-nTCNames = length(TC_names);
-
-% Initialize SPM configuration
-spm_jobman('initcfg'); 
-spm('defaults', 'fmri');
-
-% Start parallel pool if not already open
-% if isempty(gcp('nocreate'))
-%     parpool; % Create a default parallel pool
-% end
-
-for i = 4:4 %1:nMetricsNames
-    smoothing_method = {'TWsmoot', 'TWS', 'TSPOON'};
-    metrics_names = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
-    TC_names = {'GM', 'WM'};
-    inputs  = cell(3,1);
-    jobfile = cellstr(fullfile(script_dir,'aj_batch_GLM_job.m'));
-    
     for ii = 1:1 %1:nTCNames
         % Output file
-        inputs{1} = cellstr(fullfile(ds_dir,'derivatives',sprintf('AJ-%s_corrGLM',smoothing_method{meth}),sprintf('%s_%s',metrics_names{i},TC_names{ii})));
+        inputs{1} = cellstr(fullfile(ds_dir,'derivatives',sprintf('AJ-%s_GLM',smoothing_method{meth}),sprintf('%s_%s',metrics_names{i},TC_names{ii})));
         % Create output directory if it doesn't exist
         if ~exist(char(inputs{1}), 'dir')
             mkdir(char(inputs{1}));
@@ -197,9 +208,38 @@ for i = 4:4 %1:nMetricsNames
         
         % Select files for each qMRI metric and each TC for all subjects
         if meth==1
-            inputs{2} = cellstr(spm_select('FPListRec',bids_dir,sprintf('^.*%ssmo_%s.*\\.nii$',TC_names{ii},metrics_names{i})));
+            inputs{2} = cellstr(spm_select('FPListRec',smoo_dir,sprintf('^.*%ssmo_%s.*\\.nii$',TC_names{ii},metrics_names{i})));
+        elseif meth==4
+            pattern = sprintf('^susan_Mask_%s.*%s.*\\.nii(\\.gz)?$', TC_names{ii}, metrics_names{i});
+            file_list = cellstr(spm_select('FPListRec', smoo_dir, pattern));
+
+            if isempty(file_list), warning('No file found for %s %s', TC_names{ii}, metrics_names{i}); continue; end
+
+            % Unzip files if needed
+            unzipped_files = cell(size(file_list));
+
+            for f = 1:numel(file_list)
+                [~,base,ext] = fileparts(file_list{f});
+
+                if strcmp(ext,'.gz')
+                    % full filename was .nii.gz → remove .gz
+                    nii_out = fullfile(tmp_unzip_dir, base);
+                    if ~exist(nii_out,'file')
+                        fprintf('Unzipping %s\n', file_list{f});
+                        gunzip(file_list{f}, tmp_unzip_dir);
+                    end
+                    unzipped_files{f} = nii_out;
+
+                else
+                    % already .nii
+                    unzipped_files{f} = file_list{f};
+                end
+            end
+            
+            inputs{2} = unzipped_files;
+
         else
-            inputs{2} = cellstr(spm_select('FPListRec',bids_dir,sprintf('^%s_%s.*%s.*\\.nii$',smoothing_method{meth},TC_names{ii},metrics_names{i}))); 
+            inputs{2} = cellstr(spm_select('FPListRec',smoo_dir,sprintf('^%s_%s.*%s.*\\.nii$',smoothing_method{meth},TC_names{ii},metrics_names{i}))); 
         end
          
         % Select explicit masks defining GM and WM voxels
@@ -210,4 +250,4 @@ for i = 4:4 %1:nMetricsNames
     end
 end
 
-% delete(gcp('nocreate'));
+delete(gcp('nocreate'));
