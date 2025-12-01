@@ -81,15 +81,15 @@ end
 %% GLM on smoothed data
 % Cleaning environment & setting up SPM path
 clear;clc;
-addpath('C:\Users\antoi\Documents\master_thesis\MATLAB\spm12');
+% addpath('C:\Users\antoi\Documents\master_thesis\MATLAB\spm12');
+addpath("C:\Users\aj\Documents\toolbox\spm12");
 
 % Choose 'TSPOON', 'TWS' or 'TWsmoot'
-smoothing_method = {'TWsmoot', 'TWS', 'TSPOON'};
-meth = 3;
+smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
+meth = 4;
 
 % Paths to access to script, smoothed data and data
-script_dir = 'C:\Users\antoi\Documents\master_thesis\MATLAB\agingdata\reprod_article';
-ds_dir = 'D:\Master_Thesis\Data\BIDS_AgingData';
+ds_dir = 'C:\Users\aj\OneDrive - Universite de Liege\Documents\SMOOTHING\Data\BIDS_AgingData';
 if meth==1
     param.smoothName = smoothing_method{meth};
 else
@@ -102,6 +102,7 @@ metrics_names = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
 nMetricsNames = length(metrics_names);
 TC_names = {'GM', 'WM'};
 nTCNames = length(TC_names);
+
 % Initialize SPM configuration
 spm_jobman('initcfg'); 
 spm('defaults', 'fmri');
@@ -112,11 +113,11 @@ if isempty(gcp('nocreate'))
 end
 
 parfor i = 1:nMetricsNames
-    smoothing_method = {'TWsmoot', 'TWS', 'TSPOON'};
+    smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
     metrics_names = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
     TC_names = {'GM', 'WM'};
     inputs  = cell(3,1);
-    jobfile = cellstr(fullfile(script_dir,'aj_batch_GLM_job.m'));
+    jobfile = cellstr(fullfile(pwd,'aj_batch_GLM_job.m'));
     
     for ii = 1:nTCNames
         % Output file

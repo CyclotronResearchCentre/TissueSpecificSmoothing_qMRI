@@ -3,7 +3,7 @@
 % spm SPM - SPM12 (7771)
 % cfg_basicio BasicIO - Unknown
 %-----------------------------------------------------------------------
-% spm_get_defaults('stats.fmri.ufp',0.5);
+spm_get_defaults('stats.fmri.ufp',0.5);
 
 matlabbatch{1}.spm.stats.factorial_design.dir = '<UNDEFINED>';
 matlabbatch{1}.spm.stats.factorial_design.des.mreg.scans = '<UNDEFINED>';
