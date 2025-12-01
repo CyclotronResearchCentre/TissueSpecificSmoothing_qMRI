@@ -153,7 +153,7 @@ end
 
 % Cleaning environment & setting up SPM environment
 clear;clc;
-addpath('C:\Users\antoi\Documents\master_thesis\MATLAB\spm12');
+addpath("C:\Users\aj\Documents\toolbox\spm12");
 spm_get_defaults('stats.fmri.ufp',0.5);
 
 addpath("C:\Users\aj\Documents\toolbox\spm12");
@@ -191,7 +191,7 @@ if isempty(gcp('nocreate'))
     parpool; % Create a default parallel pool
 end
 
-for i = 4:4 %1:nMetricsNames
+for i = 1:1 %1:nMetricsNames
     smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
     metrics_names = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
     TC_names = {'GM', 'WM'};
@@ -241,7 +241,7 @@ for i = 4:4 %1:nMetricsNames
         else
             inputs{2} = cellstr(spm_select('FPListRec',smoo_dir,sprintf('^%s_%s.*%s.*\\.nii$',smoothing_method{meth},TC_names{ii},metrics_names{i}))); 
         end
-         
+
         % Select explicit masks defining GM and WM voxels
         inputs{3} = cellstr(spm_select('ExtFPList',fullfile(ds_dir,'derivatives'),sprintf('^atlas-.*%s_space-MNI_mask.*\\.nii$',TC_names{ii})));
         
