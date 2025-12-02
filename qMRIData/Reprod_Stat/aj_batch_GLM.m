@@ -144,24 +144,19 @@ end
 % 
 % delete(gcp('nocreate'));
 
-%% CORRECTED GLM on smoothed data
-% WARNING: have to remove % in job file to do spm_get_defaults('stats.fmri.ufp',0.5);
-
-% New script to run the initial batch for a specific qMRI parameter and
-% tissue class with spm.stats.fmri.ufp = 0.5 instead of 0.001 -> test if
-% the generated mask.nii during model estimation corresponds better.
-
+%% GLM for QUANTITATIVE smoothed data
 % Cleaning environment & setting up SPM environment
 clear;clc;
-addpath("C:\Users\aj\Documents\toolbox\spm12");
+addpath("C:\Users\lucad\Documents\smoothing\repo\spm12");
 spm_get_defaults('stats.fmri.ufp',0.5);
+spm_get_defaults('stats.rft.nonstat',1);
 
 % Choose 'TSPOON', 'TWS' or 'TWsmoot'
 smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
 meth = 4;
 
 % Paths to access to script, smoothed data and data
-ds_dir = 'C:\Users\aj\Documents\SMOOTHING\data\qMRI_AgingCallaghan';
+ds_dir = 'C:\Users\lucad\Documents\smoothing\data\qMRI_AgingCallaghan';
 if meth==1
     param.smoothName = smoothing_method{meth};
 else
@@ -189,11 +184,11 @@ if isempty(gcp('nocreate'))
     parpool; % Create a default parallel pool
 end
 
-for i = 1:1 %1:nMetricsNames
+for i = 1:nMetricsNames
     inputs  = cell(3,1);
     jobfile = {fullfile('C:\Users\aj\Documents\SMOOTHING\TissueSpecificSmoothing\qMRIData\Reprod_Stat', 'aj_batch_GLM_job.m')};
     
-    for ii = 1:1 %1:nTCNames
+    for ii = 1:nTCNames
         % Output file
         inputs{1} = cellstr(fullfile(ds_dir,'derivatives',sprintf('AJ-%s_GLM',smoothing_method{meth}),sprintf('%s_%s',metrics_names{i},TC_names{ii})));
         % Create output directory if it doesn't exist
