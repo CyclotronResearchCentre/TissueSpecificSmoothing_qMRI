@@ -153,7 +153,7 @@ spm_get_defaults('stats.rft.nonstat',1);
 
 % Choose 'TSPOON', 'TWS' or 'TWsmoot'
 smoothing_method = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
-meth = 4;
+meth = 3;
 
 % Paths to access to script, smoothed data and data
 ds_dir = 'C:\Users\lucad\Documents\smoothing\data\qMRI_AgingCallaghan';
@@ -178,15 +178,15 @@ nTCNames = length(TC_names);
 % Initialize SPM configuration
 spm_jobman('initcfg'); 
 spm('defaults', 'fmri');
+jobfile = {fullfile(pwd, 'aj_batch_GLM_job.m')};
 
 % Start parallel pool if not already open
 if isempty(gcp('nocreate'))
     parpool; % Create a default parallel pool
 end
 
-for i = 1:nMetricsNames
+parfor i = 1:nMetricsNames
     inputs  = cell(3,1);
-    jobfile = {fullfile('C:\Users\aj\Documents\SMOOTHING\TissueSpecificSmoothing\qMRIData\Reprod_Stat', 'aj_batch_GLM_job.m')};
     
     for ii = 1:nTCNames
         % Output file
