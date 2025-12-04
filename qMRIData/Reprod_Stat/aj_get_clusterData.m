@@ -182,15 +182,34 @@ for i = 1:nContrasts
         grid on;
 
         % Bar Chart of Binned Sizes
-        edges = [0, 1, 10, 50, 100, 500, max(cluster_sizes)];
-        bin_labels = {'0-1', '2-10', '11-50', '51-100', '101-500', '>500'};
+        edges = [0, 1, 10, 50, 100, 500];
+        max_cluster_size = max(cluster_sizes);
+        if max_cluster_size > edges(end)
+            edges = [edges, max_cluster_size];
+        end
+%         bin_labels = {'0-1', '2-10', '11-50', '51-100', '101-500', sprintf('%d-%d', edges(end-1)+1, edges(end))};
+        % Ensure bin_labels are unique
+        if max_cluster_size > edges(end-1)
+            bin_labels = {'0-1', '2-10', '11-50', '51-100', '101-500', sprintf('%d-%d', edges(end-1)+1, edges(end))};
+        else
+            bin_labels = {'0-1', '2-10', '11-50', '51-100', '101-500'};
+        end
         bin_counts = histcounts(cluster_sizes, edges);
         figure;
-        bar(categorical(bin_labels, bin_labels), bin_counts);
+        bar(1:length(bin_counts), bin_counts);
         xlabel('Cluster Size Ranges');
         ylabel('Number of Clusters');
         title('Distribution of Cluster Sizes by Range');
         grid on;
+%         edges = [0, 1, 10, 50, 100, 500, max(cluster_sizes)];
+%         bin_labels = {'0-1', '2-10', '11-50', '51-100', '101-500', '>500'};
+%         bin_counts = histcounts(cluster_sizes, edges);
+%         figure;
+%         bar(categorical(bin_labels, bin_labels), bin_counts);
+%         xlabel('Cluster Size Ranges');
+%         ylabel('Number of Clusters');
+%         title('Distribution of Cluster Sizes by Range');
+%         grid on;
     end
 
 end

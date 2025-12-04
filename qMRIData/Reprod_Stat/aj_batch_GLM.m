@@ -20,17 +20,17 @@ close all; clear; clc;
 
 % Choose between 'Perso PC', 'Desktop'
 flags.users = 0;
+paths = aj_default_GLM(flags); % Get user paths, set up spm12 env
 
+% USER WARNING: default spm values have to be changed in BOTH scripts (this
+% one and in the corresponding jobfile) 
 spm_get_defaults('stats.fmri.ufp',0.5); % set to 0.5 for QUANTITATIVE MRI data
 spm_get_defaults('stats.rft.nonstat',1); % set to 1 the Random Field Theory if assuming non stationary smoothing
 disp(['Current stats.fmri.ufp: ', num2str(spm_get_defaults('stats.fmri.ufp'))]);
 disp(['Current stats.rft.nonstat: ', num2str(spm_get_defaults('stats.rft.nonstat'))]);
 
 % Choose your smoothing approach between 'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'
-smoo = 2;
-
-%% Get user paths, set up spm12 env
-paths = aj_default_GLM(flags);
+smoo = 3;
 
 %% Prepare input QUANTITATIVE smoothed data
 % Set up the smoothing approaches, metrics and TC names lists
@@ -72,10 +72,10 @@ if isempty(gcp('nocreate'))
     parpool; % Create a default parallel pool
 end
 
-parfor i = 1:1 %1:length(qmetrics)
+parfor i = 1:length(qmetrics)
     inputs  = cell(3,1);
     
-    for ii = 1:1 %1:length(TCs)
+    for ii = 1:length(TCs)
         % OUTPUT Folder
         inputs{1} = cellstr(fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM',smoo_approachs{smoo}),sprintf('%s_%s',qmetrics{i},TCs{ii})));
         
