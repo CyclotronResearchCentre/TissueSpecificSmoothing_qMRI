@@ -16,23 +16,54 @@
 % Cyclotron Research Centre, University of Liege, Belgium
 %--------------------------------------------------------------------------
 %% User inputs
-close all; clear; clc;
+close all; clear all; clc;
 
 % Choose between 'Perso PC', 'Desktop'
 flags.users = 0;
-paths = aj_default_GLM(flags); % Get user paths, set up spm12 env
-
-% USER WARNING: default spm values have to be changed in BOTH scripts (this
-% one and in the corresponding jobfile) 
-spm_get_defaults('stats.fmri.ufp',0.5); % set to 0.5 for QUANTITATIVE MRI data
-spm_get_defaults('stats.rft.nonstat',1); % set to 1 the Random Field Theory if assuming non stationary smoothing
-disp(['Current stats.fmri.ufp: ', num2str(spm_get_defaults('stats.fmri.ufp'))]);
-disp(['Current stats.rft.nonstat: ', num2str(spm_get_defaults('stats.rft.nonstat'))]);
 
 % Choose your smoothing approach between 'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'
 smoo = 3;
 
-%% Prepare input QUANTITATIVE smoothed data
+% Choose your random field theory value: 1 stationary hypothesis vs 2 non
+% stationary hypothesis
+hyp = 1;
+
+% Quantitative MRI data ? 1 for yes and 0 for no
+qdata = 1;
+
+% USER WARNING: default spm values have to be changed in BOTH scripts (this
+% one and in the corresponding jobfile)
+
+if flags.users == 0
+    addpath('C:\Users\antoi\Documents\JOBS\PhD\MaterThesis\scripts\TissueSpecificSmoothing\qMRIData\Reprod_Stat');
+end
+
+% Get user paths, set up spm12 env
+paths = aj_default_GLM(flags);
+
+%% Prepare SPM default values for GLM
+% Set spm stats.fmri.ufp default value to 0.5 for QUANTITATIVE MRI data
+if qdata == 1
+    spm_get_defaults('stats.fmri.ufp',0.5);
+    current_ufp = spm_get_defaults('stats.fmri.ufp');
+    if current_ufp ~= 0.5, warning('stats.fmri.ufp a été défini à %f au lieu de 0.5.', current_ufp); end
+else
+    current_ufp = spm_get_defaults('stats.fmri.ufp');
+    if current_ufp ~= 0.001, warning('stats.fmri.ufp is equal to %f instead of 0.001 (spm default one).', current_ufp); end
+    warning('Input GLM preparation is well done only for quantitative data.');
+end
+
+% Set spm stats.rft.nonstat default value to 1 if assuming non stationary smoothing
+if hyp == 2
+    spm_get_defaults('stats.rft.nonstat',1);
+    current_rft = spm_get_defaults('stats.rft.nonstat');
+    if current_rft ~= 1, warning('stats.rft.nonstat a été défini à %f au lieu de 1.', current_rft); end
+else
+    current_rft = spm_get_defaults('stats.rft.nonstat');
+    if current_rft ~= 0, warning('stats.rft.nonstat is equal to %f instead of 0 (spm default one).', current_rft); end
+end
+
+%% Prepare input QUANTITATIVE smoothed data for GLM
 % Set up the smoothing approaches, metrics and TC names lists
 smoo_approachs = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
 qmetrics = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
@@ -57,6 +88,8 @@ if smoo==3
 end
 
 %% GLM from Callaghan et al. (2014)
+rft_hyps = {'rft0', 'rft1'};
+
 % Create the regressor files otherwise prodive the existing ones
 aj_compute_regfile(paths.ds_dir);
 
@@ -77,7 +110,7 @@ parfor i = 1:length(qmetrics)
     
     for ii = 1:length(TCs)
         % OUTPUT Folder
-        inputs{1} = cellstr(fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM',smoo_approachs{smoo}),sprintf('%s_%s',qmetrics{i},TCs{ii})));
+        inputs{1} = cellstr(fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_%s',smoo_approachs{smoo}, rft_hyps{hyp}),sprintf('%s_%s',qmetrics{i},TCs{ii})));
         
         % Create output directory if it doesn't exist
         if ~exist(char(inputs{1}), 'dir'), mkdir(char(inputs{1})); end
@@ -99,3 +132,11 @@ try
 catch
     warning('Parallel pool already closed or does not exist.');
 end
+
+%% Apply a FWE p-value of 0.05 on the GLM results & save it
+smoo_approachs = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
+rft_hyps = {'rft0', 'rft1'};
+GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_%s',smoo_approachs{smoo}, rft_hyps{hyp}));
+if ~exist(GLM_dir, 'dir'), warning('No GLM folder at %s', GLM_dir); end
+
+aj_automate_spm_results(GLM_dir);

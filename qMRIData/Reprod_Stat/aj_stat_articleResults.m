@@ -35,7 +35,7 @@ resutls_info = cell(nsmoo,1);
 for i = 1:nsmoo
     params = cell(nCombi,1);
     for ii = 1:nCombi
-        GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft0',smoo_approachs{i}),combinations{ii});
+        GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft1',smoo_approachs{i}),combinations{ii});
         
         % Get xSPM all the contrasts contained in this GLM_dir
         GLM_xSPM = aj_get_xSPM(GLM_dir);
@@ -63,7 +63,7 @@ all_GLM_xSPM = cell(nsmoo,1);
 for i = 1:nsmoo
     GLM_xSPM = cell(nCombi,1);
     for ii = 1:nCombi
-        GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft0',smoo_approachs{i}),combinations{ii});
+        GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft1',smoo_approachs{i}),combinations{ii});
         GLM_xSPM{ii} = aj_get_xSPM(GLM_dir);
     end
     all_GLM_xSPM{i} = GLM_xSPM;
@@ -97,10 +97,13 @@ end
 % Can choose the 2 smoothing_method
 % after statistical test using p<0.05 FWE corrected level
 
+meth1 = 2;
+meth2 = 3;
+
 data_info = struct();
-data_info.metric1 = smoo_approachs{2};
-data_info.metric2 = smoo_approachs{3};
-pth_out_dir = fullfile(paths.ds_dir,'derivatives','qMRI_results','rft0','thrScatterPlot');
+data_info.metric1 = smoo_approachs{meth1};
+data_info.metric2 = smoo_approachs{meth2};
+pth_out_dir = fullfile(paths.ds_dir,'derivatives','qMRI_results','rft1','thrScatterPlot');
 
 % Divide indices into three groups
 indices_T1 = 1:3:length(SUSAN_u); % Indices of T1 contrast
@@ -123,7 +126,7 @@ for i = 1:length(contrasts)
 end
 
 %% Cluster Level Comparison: Finding the numbers of significant voxels and clusters
-pth_out = fullfile(paths.ds_dir,'derivatives','qMRI_results','rft0','ClusterData');
+pth_out = fullfile(paths.ds_dir,'derivatives','qMRI_results','rft1','ClusterData');
 
 all_GLM_data = cell(nsmoo,1);
 Smoot_GLM_clusterData = cell(nsmoo,1);
@@ -131,7 +134,7 @@ for i = 1:nsmoo
     GLM_data = cell(nCombi,1);
     GLM_clusterData = cell(nCombi,1);
     for ii = 1:nCombi
-        GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft0',smoo_approachs{i}),combinations{ii});
+        GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft1',smoo_approachs{i}),combinations{ii});
         basename = sprintf('%s_%s',smoo_approachs{i},combinations{ii});
         [GLM_data{ii}, GLM_clusterData{ii}] = aj_get_clusterData(GLM_dir,pth_out,basename);
     end
@@ -209,14 +212,14 @@ save(fullfile(folderPath, 'merged_data_with_titles.mat'), 'mergedTable');
 % after statistical test using p<0.05 FWE corrected level
 
 meth1 = 1;
-meth2 = 3;
+meth2 = 2;
 
 flagBinary = 1; % make the matrix binary
 all_binThrMatrix = cell(nsmoo,1);
 for i = 1:nsmoo % orig_TWS is not relevant here
     binThrMatrix = cell(nCombi,1);
     for ii = 1:nCombi
-        GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft0',smoo_approachs{i}),combinations{ii});
+        GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft1',smoo_approachs{i}),combinations{ii});
         binThrMatrix{ii} = aj_get_thrMatrix(GLM_dir, flagBinary);
     end
     all_binThrMatrix{i} = binThrMatrix;
@@ -256,7 +259,7 @@ thrSimMetrics = array2table(all_simMetrics, ...
     'RowNames', all_row_titles);
 
 % Save the table as .mat file
-pth_out = fullfile(paths.ds_dir,'derivatives','qMRI_results','rft0','SimMetrics');
+pth_out = fullfile(paths.ds_dir,'derivatives','qMRI_results','rft1','SimMetrics');
 output_file = fullfile(pth_out, sprintf('thrSimMetrics_%s_%s.mat',smoo_approachs{meth1},smoo_approachs{meth2}));
 save(output_file, 'thrSimMetrics');
 
@@ -315,11 +318,11 @@ fprintf('Similarity metrics table saved to %s\n', output_file);
 
 %% Bland-Altman plot
 % TWsmoot is not relevant here -> subject-specific denominator
-meth1 = 1;
+meth1 = 2;
 meth2 = 3;
 
-SM1_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft0',smoo_approachs{meth1}));
-SM2_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft0',smoo_approachs{meth2}));
+SM1_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft1',smoo_approachs{meth1}));
+SM2_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft1',smoo_approachs{meth2}));
 contrasts = {'spmT_0001.nii', 'spmT_0002.nii', 'spmF_0003.nii'};
 
 % Create regular expressions for all contrasts
@@ -347,8 +350,8 @@ SM1_list_cells = cellstr(SM1_list);
 SM2_list_cells = cellstr(SM2_list);
 
 % Extract the relevant parts of the paths
-SM1_relPaths = cellfun(@(x) extractAfter(x, 'GLM_rft0\'), SM1_list_cells, 'UniformOutput', false);
-SM2_relPaths = cellfun(@(x) extractAfter(x, 'GLM_rft0\'), SM2_list_cells, 'UniformOutput', false);
+SM1_relPaths = cellfun(@(x) extractAfter(x, 'GLM_rft1\'), SM1_list_cells, 'UniformOutput', false);
+SM2_relPaths = cellfun(@(x) extractAfter(x, 'GLM_rft1\'), SM2_list_cells, 'UniformOutput', false);
 
 % Compare the relative paths
 are_relative_paths_same = isequal(sort(SM1_relPaths), sort(SM2_relPaths));
@@ -371,7 +374,7 @@ all_std_diff = cell(SM1_nContrasts,1);
 for i = 1:SM1_nContrasts
     matrix3D_1 = spm_read_vols(spm_vol(SM1_list(i,:)));
     matrix3D_2 = spm_read_vols(spm_vol(SM2_list(i,:)));
-    pth_out = fullfile(paths.ds_dir,'derivatives','qMRI_results','rft0','BlandAltman',sprintf('%s.eps',basename_out{i}));
+    pth_out = fullfile(paths.ds_dir,'derivatives','qMRI_results','rft1','BlandAltman',sprintf('%s.eps',basename_out{i}));
     plot_title = char(plot_titles{i});
     [all_mean_diff{i},all_std_diff{i}] = aj_BlandAltman(matrix3D_1, matrix3D_2, flag, pth_out, plot_title);
 end
