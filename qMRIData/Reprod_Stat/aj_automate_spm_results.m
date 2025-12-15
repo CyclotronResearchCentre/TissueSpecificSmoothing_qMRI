@@ -1,3 +1,5 @@
+% not working yet
+
 function aj_automate_spm_results(GLM_dir)
     % Démarrer SPM12
     spm('defaults', 'FMRI');

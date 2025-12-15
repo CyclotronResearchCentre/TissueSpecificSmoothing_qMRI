@@ -63,7 +63,7 @@ all_GLM_xSPM = cell(nsmoo,1);
 for i = 1:nsmoo
     GLM_xSPM = cell(nCombi,1);
     for ii = 1:nCombi
-        GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft1',smoo_approachs{i}),combinations{ii});
+        GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_rft0',smoo_approachs{i}),combinations{ii});
         GLM_xSPM{ii} = aj_get_xSPM(GLM_dir);
     end
     all_GLM_xSPM{i} = GLM_xSPM;

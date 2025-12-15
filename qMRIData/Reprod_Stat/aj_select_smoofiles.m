@@ -1,4 +1,4 @@
-function selected_files = aj_select_smoofiles(smoo, smoo_dir, smoo_approach, qmetric, TC)
+function selected_files = aj_select_smoofiles(tmp_unzip_dir, smoo, smoo_dir, smoo_approach, qmetric, TC)
 
 % Select files for each qMRI metric and each TC for all subjects
 if smoo==1

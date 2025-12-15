@@ -22,7 +22,7 @@ close all; clear all; clc;
 flags.users = 0;
 
 % Choose your smoothing approach between 'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'
-smoo = 3;
+smoo = 4;
 
 % Choose your random field theory value: 1 stationary hypothesis vs 2 non
 % stationary hypothesis
@@ -101,14 +101,14 @@ spm('defaults', 'fmri');
 jobfile = {fullfile(paths.script_dir, 'aj_batch_GLM_job.m')};
 
 % Start parallel pool if not already open
-if isempty(gcp('nocreate'))
-    parpool; % Create a default parallel pool
-end
+% if isempty(gcp('nocreate'))
+%     parpool; % Create a default parallel pool
+% end
 
-parfor i = 1:length(qmetrics)
+for i = 4:4 %1:length(qmetrics)
     inputs  = cell(3,1);
     
-    for ii = 1:length(TCs)
+    for ii = 1:1 %1:length(TCs)
         % OUTPUT Folder
         inputs{1} = cellstr(fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_%s',smoo_approachs{smoo}, rft_hyps{hyp}),sprintf('%s_%s',qmetrics{i},TCs{ii})));
         
@@ -116,24 +116,24 @@ parfor i = 1:length(qmetrics)
         if ~exist(char(inputs{1}), 'dir'), mkdir(char(inputs{1})); end
         
         % INPUT Arguments: all nifti files for each qMRI metric and each TC for all subjects
-        inputs{2} = aj_select_smoofiles(smoo, smoo_dir, smoo_approachs{smoo}, qmetrics{i}, TCs{ii});
+        inputs{2} = aj_select_smoofiles(tmp_unzip_dir, smoo, smoo_dir, smoo_approachs{smoo}, qmetrics{i}, TCs{ii});
         if isempty(inputs{2}) || all(cellfun(@isempty, inputs{2})), warning('No file found for %s %s', TCs{ii}, qmetrics{i}); continue; end
 
         % Select explicit masks defining GM and WM voxels
         inputs{3} = cellstr(spm_select('ExtFPList',fullfile(paths.ds_dir,'derivatives'),sprintf('^atlas-.*%s_space-MNI_mask.*\\.nii$',TCs{ii})));
         if isempty(inputs{3}), warning('No mask file found for %s', TCs{ii}); continue; end
 
-        spm_jobman('run', jobfile, inputs{:});
+%         spm_jobman('run', jobfile, inputs{:});
     end
 end
 
-try
-    delete(gcp('nocreate'));
-catch
-    warning('Parallel pool already closed or does not exist.');
-end
+% try
+%     delete(gcp('nocreate'));
+% catch
+%     warning('Parallel pool already closed or does not exist.');
+% end
 
-%% Apply a FWE p-value of 0.05 on the GLM results & save it
+%% IN WORK : Apply a FWE p-value of 0.05 on the GLM results & save it
 smoo_approachs = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
 rft_hyps = {'rft0', 'rft1'};
 GLM_dir = fullfile(paths.ds_dir,'derivatives',sprintf('AJ-%s_GLM_%s',smoo_approachs{smoo}, rft_hyps{hyp}));
