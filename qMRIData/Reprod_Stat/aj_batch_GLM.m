@@ -26,10 +26,10 @@ smoo = 4;
 
 % Choose your random field theory value: 1 stationary hypothesis vs 2 non
 % stationary hypothesis
-hyp = 1;
+hyp = 2;
 
 % Quantitative MRI data ? 1 for yes and 0 for no
-qdata = 1;
+qdata = 0;
 
 % USER WARNING: default spm values have to be changed in BOTH scripts (this
 % one and in the corresponding jobfile)
@@ -116,14 +116,14 @@ for i = 4:4 %1:length(qmetrics)
         if ~exist(char(inputs{1}), 'dir'), mkdir(char(inputs{1})); end
         
         % INPUT Arguments: all nifti files for each qMRI metric and each TC for all subjects
-        inputs{2} = aj_select_smoofiles(tmp_unzip_dir, smoo, smoo_dir, smoo_approachs{smoo}, qmetrics{i}, TCs{ii});
+        inputs{2} = aj_select_smoofiles(tmp_unzip_dir, smoo, smoo_dir, smoo_approachs, qmetrics{i}, TCs{ii});
         if isempty(inputs{2}) || all(cellfun(@isempty, inputs{2})), warning('No file found for %s %s', TCs{ii}, qmetrics{i}); continue; end
 
         % Select explicit masks defining GM and WM voxels
         inputs{3} = cellstr(spm_select('ExtFPList',fullfile(paths.ds_dir,'derivatives'),sprintf('^atlas-.*%s_space-MNI_mask.*\\.nii$',TCs{ii})));
         if isempty(inputs{3}), warning('No mask file found for %s', TCs{ii}); continue; end
 
-%         spm_jobman('run', jobfile, inputs{:});
+        spm_jobman('run', jobfile, inputs{:});
     end
 end
 

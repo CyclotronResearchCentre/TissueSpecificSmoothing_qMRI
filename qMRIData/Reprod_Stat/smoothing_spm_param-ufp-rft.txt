@@ -1,0 +1,148 @@
+Tu observes quelque chose de **cohérent avec le fonctionnement interne de SPM**. La différence vient du fait que **`rft.nonstat` intervient directement dans le calcul de la correction FWE**, alors que **`ufp` n’intervient que dans certaines étapes de cluster inference**.
+
+Je détaille précisément.
+
+---
+
+# 1️⃣ Pourquoi `ufp` ne change rien dans ton cas
+
+Le paramètre :
+
+```matlab
+spm_get_defaults('stats.fmri.ufp',0.5)
+```
+
+définit le **cluster-forming threshold** (seuil voxel non corrigé) utilisé pour **détecter les clusters**.
+
+Ce paramètre n’est utilisé que si l’inférence se fait :
+
+```
+cluster-level FWE
+```
+
+Dans ton cas tu fais :
+
+```
+t-test
+p < 0.05 FWE
+(voxel level)
+```
+
+Dans **Statistical Parametric Mapping**, l’inférence voxel-wise FWE utilise directement la **Random Field Theory du maximum voxel**.
+
+Le seuil critique est calculé à partir de :
+
+* la **smoothness estimée**
+* le **volume en resels**
+* les **degrés de liberté**
+
+Donc :
+
+```
+ufp n’intervient pas
+```
+
+C’est pourquoi :
+
+* le **seuil statistique**
+* les **voxels significatifs**
+* les **clusters résultants**
+
+restent identiques.
+
+---
+
+# 2️⃣ Pourquoi `rft.nonstat` change les résultats
+
+Le paramètre :
+
+```matlab
+spm_get_defaults('stats.rft.nonstat',1)
+```
+
+active la **Random Field Theory non stationnaire**.
+
+Cela signifie que SPM n’assume plus :
+
+[
+\text{smoothness constante dans l’image}
+]
+
+mais estime une **smoothness locale variable**.
+
+Cette correction affecte directement :
+
+* le calcul du **nombre effectif de resels**
+* la **distribution du maximum du champ statistique**
+
+Donc elle influence :
+
+```
+voxel-wise FWE
+ET
+cluster-wise FWE
+```
+
+C’est pourquoi dans ton analyse :
+
+| paramètre     | influence             |
+| ------------- | --------------------- |
+| `ufp`         | aucune                |
+| `rft.nonstat` | change les seuils FWE |
+
+---
+
+# 3️⃣ Pourquoi cela arrive particulièrement avec tes données
+
+Tu as mentionné que tes données :
+
+* ont un **lissage non linéaire**
+* ont une **variance hétérogène**
+* ont une **smoothness non stationnaire**
+
+Dans ce cas :
+
+```
+rft.nonstat = 0
+```
+
+→ suppose une smoothness globale.
+
+```
+rft.nonstat = 1
+```
+
+→ corrige pour une smoothness variable.
+
+Donc le **nombre de resels estimé change**, et donc le **seuil FWE change**.
+
+---
+
+# 4️⃣ Résumé
+
+| paramètre            | rôle                             | influence dans ton analyse |
+| -------------------- | -------------------------------- | -------------------------- |
+| `stats.fmri.ufp`     | seuil voxel pour former clusters | ❌ aucune                   |
+| `stats.rft.nonstat`  | correction RFT non stationnaire  | ✔ change les seuils FWE    |
+| GLM estimation       | estimation β                     | ❌ inchangée                |
+| FWE voxel correction | dépend des resels                | ✔ affectée par `nonstat`   |
+
+---
+
+✅ **Conclusion**
+
+Tu observes exactement ce que prévoit SPM :
+
+* `ufp` n’a **aucun effet** sur une inférence **voxel-wise FWE**
+* `rft.nonstat` modifie **le calcul des resels**, donc **le seuil FWE**, même au niveau voxel.
+
+---
+
+💡 Point important pour ton projet :
+avec un **lissage non linéaire produisant une smoothness très variable**, utiliser
+
+```
+spm_get_defaults('stats.rft.nonstat',1)
+```
+
+est généralement **plus approprié**, car la RFT stationnaire devient théoriquement incorrecte.

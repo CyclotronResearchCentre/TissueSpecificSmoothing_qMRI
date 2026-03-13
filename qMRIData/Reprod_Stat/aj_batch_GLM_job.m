@@ -4,7 +4,7 @@
 % cfg_basicio BasicIO - Unknown
 %-----------------------------------------------------------------------
 %% Change spm default values
-spm_get_defaults('stats.fmri.ufp',0.5); % set to 0.5 for QUANTITATIVE MRI data
+% spm_get_defaults('stats.fmri.ufp',0.5); % set to 0.5 for QUANTITATIVE MRI data
 spm_get_defaults('stats.rft.nonstat',1); % set to 1 the Random Field Theory if assuming non stationary smoothing
 
 disp(['Current stats.fmri.ufp: ', num2str(spm_get_defaults('stats.fmri.ufp'))]);
