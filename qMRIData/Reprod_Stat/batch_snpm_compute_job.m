@@ -1,1 +1,0 @@
-matlabbatch{1}.spm.tools.snpm.cp.snpmcfg = '<UNDEFINED>';

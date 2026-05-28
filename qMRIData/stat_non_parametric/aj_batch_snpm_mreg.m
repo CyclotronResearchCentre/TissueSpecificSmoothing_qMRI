@@ -14,26 +14,28 @@
 %--------------------------------------------------------------------------
 %% User inputs
 clear all; clc; close all;
-% ds_dir = 'E:\Master_Thesis\Data\BIDS_AgingData\derivatives';
-ds_dir = 'C:\Users\antoi\Documents\JOBS\PhD\MaterThesis\data_sample\derivatives';
+ds_dir = 'E:\Master_Thesis\Data\BIDS_AgingData\derivatives';
+% ds_dir = 'C:\Users\antoi\Documents\JOBS\PhD\MaterThesis\data_sample\derivatives';
 
 smoo_approaches = {'TWsmoot', 'TWS', 'TSPOON', 'SUSAN'};
 qmetrics = {'MTsat', 'PDmap', 'R1map', 'R2starmap'};
 tcs = {'GM', 'WM'};
 
-%% Script
-% Initialize SPM configuration
 addpath("C:\Users\antoi\Documents\JOBS\PhD\MaterThesis\scripts\spm12");
-spm_jobman('initcfg');
-spm('defaults', 'FMRI');
 
 % Select the jobfile for GLM
 script_dir = 'C:\Users\antoi\Documents\JOBS\PhD\MaterThesis\scripts\TissueSpecificSmoothing\qMRIData\Reprod_Stat';
+
+%% Initialize SPM configuration
+spm_jobman('initcfg');
+spm('defaults', 'FMRI');
+
+%% Model Estimation
 jobfile = {fullfile(script_dir, 'batch_snpm_mreg_job.m')};
 
-% if isempty(gcp('nocreate')), parpool; end % Start a default parallel pool if not already open
+if isempty(gcp('nocreate')), parpool; end
 
-for smoo = 3:3 %1:length(smoo_approaches)
+for smoo = 2:3 %1:length(smoo_approaches)
     smoo_dir = fullfile(ds_dir, smoo_approaches{smoo});
     if smoo==3, aj_rename_gtspoon(smoo_dir); end % Function to rename GTSPOON files if needed
     
@@ -58,10 +60,11 @@ for smoo = 3:3 %1:length(smoo_approaches)
     end
 end
 
+%% Model Computation
 jobfile = {fullfile(script_dir, 'batch_snpm_compute_job.m')};
 
 for smoo = 3:3 %1:length(smoo_approaches)    
-    for qmetric = 1:length(qmetrics)
+    for qmetric = 3:4 %1:length(qmetrics)
         inputs  = cell(1,1);
         for tc = 1:length(tcs)
             % Compute
@@ -73,13 +76,14 @@ for smoo = 3:3 %1:length(smoo_approaches)
     end
 end
 
-jobfile = {fullfile(script_dir, 'batch_snpm_inference_job.m')};
+%% Statistical Inference
+jobfile = {fullfile(script_dir, 'batch_snpm_inference_ar-pos_job.m')};
 
-for smoo = 3:3 %1:length(smoo_approaches)    
-    for qmetric = 1:length(qmetrics)
+for smoo = 2:2 %1:length(smoo_approaches)
+    for qmetric = 4:4 %1:length(qmetrics)
         inputs  = cell(1,1);
-        for tc = 1:length(tcs)
-            % Inefrence at voxel level
+        for tc = 2:2 %1:length(tcs)
+            % Inference at voxel level
             inputs{1} = cellstr(fullfile(ds_dir,sprintf('SnPM-%s_mreg-age',smoo_approaches{smoo}),sprintf('%s_%s',qmetrics{qmetric},tcs{tc}), 'SnPM.mat'));
             if isempty(inputs{1}) || all(cellfun(@isempty, inputs{1})), warning('No results file from computed model found for %s %s', tcs{tc}, qmetrics{qmetric}); continue; end
             
@@ -88,4 +92,4 @@ for smoo = 3:3 %1:length(smoo_approaches)
     end
 end
 
-% try, delete(gcp('nocreate')); catch, warning('Parallel pool already closed or does not exist.'); end
+try delete(gcp('nocreate')); catch, warning('Parallel pool already closed or does not exist.'); end
