@@ -1,18 +1,5 @@
-% compare_smoothing_via_LL_AIC_BIC.m
-% ---------------------------------------------------------
-% Compare 3 smoothing methods using group-level SPM.mat outputs.
-% Steps:
-%  1) load each SPM.mat
-%  2) read design matrix X (SPM.xX.X) and subject image list (SPM.xY.P)
-%  3) read beta images (beta_0001..beta_p)
-%  4) reconstruct predicted values mu_s(v) = X(s,:) * beta(v,:)'
-%  5) load ResMS image -> sigma2(v)
-%  6) compute LL(v) = sum_s log N(Y_s(v) | mu_s(v), sigma2(v))
-%  7) compute AIC/BIC per voxel: AIC = 2k - 2LL ; BIC = k*log(n) - 2LL
-%  8) save LL/AIC/BIC maps and produce "best method" maps
-%
-% Requirements: SPM12 in MATLAB path
-% Author: Antoine Jacquemin
+% aj_compare_smoothing_via_voxelwise_log_likelihood.m
+
 % ---------------------------------------------------------
 %% ============== USER SETTINGS ==============
 clear all; close all; clc;
@@ -31,10 +18,6 @@ combination_names = {
     'R2starmap_GM'
     'R2starmap_WM'
 };
-
-% combination_names = {
-
-% };
 
 basepaths = {
     'E:\Master_Thesis\Data\BIDS_AgingData\derivatives\AJ-SUSAN_GLM_rft1\'
