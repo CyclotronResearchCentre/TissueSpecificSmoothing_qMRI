@@ -68,7 +68,7 @@ for smoo = 1:length(smoo_approaches)
 
     % Optional preprocessing step (dataset-specific correction)
     if smoo == 3
-        aj_rename_gtspoon(smoo_dir);
+        aj_get_gtspoon_rename(smoo_dir);
     end
 
     for q = 1:length(qmetrics)
@@ -84,7 +84,7 @@ for smoo = 1:length(smoo_approaches)
                 mkdir(outdir);
             end
 
-            scans = aj_select_smoofiles(smoo, smoo_dir, smoo_approaches, ...
+            scans = aj_get_smoofiles_selection(smoo, smoo_dir, smoo_approaches, ...
                                         qmetrics{q}, tcs{tc});
 
             if isempty(scans) || all(cellfun(@isempty, scans))

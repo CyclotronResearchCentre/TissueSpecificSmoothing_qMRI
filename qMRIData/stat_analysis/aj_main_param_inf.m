@@ -127,7 +127,7 @@ end
 % Generate covariate files if they do not already exist.
 % =========================================================================
 
-aj_compute_regfile(cfg.dataset_dir);
+aj_get_regfile(cfg.dataset_dir);
 
 %% ========================================================================
 % TSPOON FILENAME STANDARDIZATION
@@ -137,7 +137,7 @@ aj_compute_regfile(cfg.dataset_dir);
 
 if strcmpi(cfg.smoothing_name, 'TSPOON')
 
-    aj_rename_gtspoon(cfg.smoothing_dir);
+    aj_get_gtspoon_rename(cfg.smoothing_dir);
 end
 
 %% ========================================================================
@@ -183,7 +183,7 @@ for iMetric = 1:numel(cfg.qmetrics)
         %% ----------------------------------------------------------------
         % Input qMRI maps
         % -----------------------------------------------------------------
-        scans = aj_select_smoofiles( ...
+        scans = aj_get_smoofiles_selection( ...
             cfg.smoothing_index, ...
             cfg.smoothing_dir, ...
             cfg.smoothing_methods, ...
