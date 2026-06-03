@@ -5,8 +5,8 @@
 This repository contains the MATLAB and Python pipelines used to evaluate and compare several smoothing strategies for quantitative MRI (qMRI) data, including:
 
 * **Tissue-Weighted Smoothing (TWS)**
-* **gTSPOON (Gaussian Tissue-Specific Probabilistic Outlier-Optimized Normalization)**
-* **SUSAN (Smallest Univalue Segment Assimilating Nucleus)**
+* **gTSPOON (generalized Tissue SPecific smOOthing compeNsated)**
+* **SUSANs (Smallest Univalue Segment Assimilating Nucleus smoothing)**
 
 The objective is to investigate the impact of different smoothing approaches on quantitative MRI parameter maps while preserving tissue specificity and anatomical boundaries.
 
@@ -18,7 +18,7 @@ The framework was developed for whole-brain voxel-wise analyses of multiparamete
 
 ### Tissue-Weighted Smoothing (TWS)
 
-TWS performs tissue-specific Gaussian smoothing using tissue probability maps (TPMs) as weighting functions. For each voxel, a normalized weighted average is computed:
+TWS (Draganski et al. 2014) performs tissue-specific Gaussian smoothing using tissue probability maps (TPMs) as weighting functions. For each voxel, a normalized weighted average is computed:
 
 [
 TWS(x)=\frac{(g * (\omega s))(x)}
@@ -38,7 +38,7 @@ This approach minimizes signal contamination across tissue boundaries by restric
 
 ### gTSPOON
 
-gTSPOON extends tissue-specific smoothing by incorporating probabilistic tissue information and Gaussian weighting while explicitly addressing partial-volume effects. The method aims to improve tissue specificity compared with conventional Gaussian filtering while maintaining robust noise reduction.
+gTSPOON (TSPOON originally introduced by Lee et al. 2009) extends tissue-specific smoothing by incorporating probabilistic tissue information and Gaussian weighting while explicitly addressing partial-volume effects. The method aims to improve tissue specificity compared with conventional Gaussian filtering while maintaining robust noise reduction.
 
 ---
 
