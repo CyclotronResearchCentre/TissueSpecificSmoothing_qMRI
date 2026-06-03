@@ -92,17 +92,7 @@ dt = \frac{\mathrm{FWHM}}{\sqrt{8\ln(2)}}.
 
 ## Comparison Framework
 
-The different smoothing approaches were compared using voxel-wise analyses performed on quantitative MRI maps.
-
-Comparisons focused on:
-
-* preservation of tissue specificity,
-* sensitivity to partial-volume effects,
-* noise reduction performance,
-* impact on statistical inference,
-* spatial extent and localization of significant effects.
-
-All smoothing methods were applied using matched smoothing scales to ensure fair comparisons.
+The different smoothing approaches were compared using voxel-wise analyses including voxel-wise log-likekihood, Bland-Altman plots performed on quantitative MRI maps. All smoothing methods were applied using matched smoothing scales to ensure fair comparisons.
 
 ---
 
@@ -112,19 +102,11 @@ Voxel-wise statistical analyses were performed using:
 
 ### SPM12
 
-Statistical Parametric Mapping (SPM12) was used to build and estimate General Linear Models (GLMs), including:
-
-* multiple regression analyses,
-* group comparisons,
-* covariate-based models.
-
-Parametric statistical inference was performed using Random Field Theory (RFT) correction procedures implemented in SPM.
+Statistical Parametric Mapping (SPM12) was used to build and estimate General Linear Models (GLMs). Parametric statistical inference was performed using Random Field Theory (RFT) under stationary and non stationary assumption procedures implemented in SPM.
 
 ### SnPM13
 
-Statistical NonParametric Mapping (SnPM13) was used to perform permutation-based inference.
-
-SnPM provides robust family-wise error (FWE) control without relying on Gaussian random field assumptions and is particularly well suited for qMRI studies with moderate sample sizes or non-Gaussian residual distributions.
+Statistical NonParametric Mapping (SnPM13) was used to perform permutation-based inference. SnPM provides robust family-wise error (FWE) control without relying on Gaussian random field assumptions and is particularly well suited for qMRI studies with moderate sample sizes or non-Gaussian residual distributions.
 
 Both parametric (SPM) and non-parametric (SnPM) approaches were used to evaluate the robustness of smoothing-dependent findings.
 
@@ -132,20 +114,10 @@ Both parametric (SPM) and non-parametric (SnPM) approaches were used to evaluate
 
 ## Software Requirements
 
-* MATLAB (R2021a or later recommended)
+* MATLAB (R2019b or later recommended)
 * SPM12
 * SnPM13
 * FSL (for SUSAN smoothing)
 * Python 3.x
 
-  * NumPy
-  * Pandas
-  * NiBabel
 
----
-
-## References
-
-Smith SM, Brady JM. *SUSAN—A New Approach to Low Level Image Processing*. International Journal of Computer Vision. 1997;23(1):45–78. doi:10.1023/A:1007963824710
-
-Chen Y, Hopp FR, Malik M, Wang PT, Woodman K, Youk S, Weber R. *Reproducing FSL's fMRI Data Analysis via Nipype: Relevance, Challenges, and Solutions*. Frontiers in Neuroimaging. 2022;1:953215. doi:10.3389/fnimg.2022.953215
