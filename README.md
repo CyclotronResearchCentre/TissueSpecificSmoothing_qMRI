@@ -49,7 +49,7 @@ $$
 \underbrace{
 \frac{g * (M_{WM}\, s(\phi))(x)}{g * M_{WM}(x)}
 }_{=\mathrm{TSPOON}(x)}
-\;\xrightarrow[]{}\;
+\xrightarrow[]{}
 \underbrace{
 \frac{g * (M_{TC}\, s(\phi))(x)}{g * M_{TC}(x)}
 }_{=\mathrm{gTSPOON}(x)}
