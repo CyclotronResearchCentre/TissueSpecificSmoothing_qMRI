@@ -20,17 +20,22 @@ The framework was developed for whole-brain voxel-wise analyses of multiparamete
 
 TWS (Draganski et al. 2014) performs tissue-specific Gaussian smoothing using tissue probability maps (TPMs) as weighting functions. For each voxel, a normalized weighted average is computed:
 
-[
-TWS(x)=\frac{(g * (\omega s))(x)}
-{(g * \omega)(x)}
-]
+$$
+TWS(x) =
+\frac{(g \ast (\omega\, s(\phi)))(x)}{(g \ast \omega)(x)}
+\quad\text{with}\quad
+\begin{cases}
+TPM(x) > 0.05 \\
+(g \ast \omega)(x) > 0.05
+\end{cases}
+$$
 
 where:
 
-* (s) is the quantitative MRI map,
-* (\omega) is the tissue probability map,
-* (g) is a Gaussian kernel,
-* (*) denotes convolution.
+* s(\phi) is the quantitative warped MRI map into standard space,
+* \omega is the modulated tissue weights,
+* g is a Gaussian kernel,
+* * denotes convolution.
 
 This approach minimizes signal contamination across tissue boundaries by restricting smoothing to voxels with similar tissue probabilities.
 
@@ -40,41 +45,42 @@ This approach minimizes signal contamination across tissue boundaries by restric
 
 gTSPOON (TSPOON originally introduced by Lee et al. 2009) extends tissue-specific smoothing by incorporating probabilistic tissue information and Gaussian weighting while explicitly addressing partial-volume effects. The method aims to improve tissue specificity compared with conventional Gaussian filtering while maintaining robust noise reduction.
 
+$$
+\underbrace{
+\frac{g * (M_{WM}\, s(\phi))(x)}{g * M_{WM}(x)}
+}_{=\mathrm{TSPOON}(x)}
+\;\xrightarrow[\;\;]{}\;
+\underbrace{
+\frac{g * (M_{TC}\, s(\phi))(x)}{g * M_{TC}(x)}
+}_{=\mathrm{gTSPOON}(x)}
+\quad\text{with}\quad
+(g * M_{TC})(x) > 0.05
+$$
+
+where:
+* s(\phi) is the quantitative maps warped into standard space,
+* M_{TC} is the "majority and greater than 20%" tissue mask,
+* g is a Gaussian kernel,
+* * denotes convolution.
+
 ---
 
 ### SUSAN
 
-SUSAN (Smith and Brady, 1997) is a non-linear edge-preserving smoothing algorithm implemented in FSL.
+The Smallest Univalue Segment Assimilating Nucleus (SUSAN) (Smith and Brady, 1997) is a non-linear edge-preserving smoothing algorithm implemented in FSL.
 
-For a voxel (p) and neighboring voxel (x), SUSAN combines:
+For a voxel (x), SUSANs can be expressed:
 
-* a spatial weighting term:
+$$
+SUSANs(x) =
+\; \text{susan} \ast (M_{TC}\, s(\phi))(x)
+$$
 
-[
-c_s(p,x)=
-\exp\left(
--\frac{|x-p|^2}{2dt^2}
-\right)
-]
+where:
+* s(\phi) is the quantitative maps warped into standard space,
+* M_{TC} is the "majority and greater than 20%" tissue mask,
+* susan* denotes the SUSAN smoothing operator.
 
-* an intensity similarity term:
-
-[
-c_b(p,x)=
-\exp\left(
--\left(
-\frac{I(x)-I(p)}{bt}
-\right)^2
-\right)
-]
-
-The final weight is:
-
-[
-w(p,x)=c_s(p,x)c_b(p,x)
-]
-
-and the smoothed intensity is obtained as a normalized weighted average.
 
 For qMRI applications, the brightness threshold ((bt)) was computed as:
 
