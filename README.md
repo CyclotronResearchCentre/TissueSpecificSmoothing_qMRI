@@ -49,7 +49,7 @@ $$
 \underbrace{
 \frac{g * (M_{WM}\, s(\phi))(x)}{g * M_{WM}(x)}
 }_{=\mathrm{TSPOON}(x)}
-\;\xrightarrow[\;\;]{}\;
+\;\xrightarrow[]{}\;
 \underbrace{
 \frac{g * (M_{TC}\, s(\phi))(x)}{g * M_{TC}(x)}
 }_{=\mathrm{gTSPOON}(x)}
@@ -72,8 +72,7 @@ The Smallest Univalue Segment Assimilating Nucleus (SUSAN) (Smith and Brady, 199
 For a voxel (x), SUSANs can be expressed:
 
 $$
-SUSANs(x) =
-\; \text{susan} \ast (M_{TC}\, s(\phi))(x)
+SUSANs(x) = \text{susan} \ast (M_{TC}\, s(\phi))(x)
 $$
 
 where:
